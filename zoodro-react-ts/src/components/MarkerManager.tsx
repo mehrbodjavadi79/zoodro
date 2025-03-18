@@ -14,6 +14,8 @@ interface Vendor {
   lng: number;
   name: string;
   off: number;
+  max: number | null;
+  min: number | null;
 }
 
 interface MarkerManagerProps {
@@ -43,6 +45,18 @@ const createCustomOfferIcon = (discount: number): L.DivIcon => {
     iconAnchor: [20, 40],
     popupAnchor: [0, -40]
   });
+};
+
+
+const formatOfferInfo = (max: number | null, min: number | null): string => {
+  if (max && min) {
+    return `حداقل خرید ${min/10} ت - حداکثر ${max/10} ت`;
+  } else if (max) {
+    return `حداکثر ${max/10} ت`;
+  } else if (min) {
+    return `حداقل خرید ${min/10} ت`;
+  }
+  return "نامحدود";
 };
 
 // Memoized individual vendor marker component
@@ -75,6 +89,8 @@ const VendorMarker = memo(({ vendor, icon }: { vendor: Vendor; icon: L.Icon }) =
       document.body.removeChild(notification);
     }, 2000);
   };
+
+  const offerInfo = formatOfferInfo(vendor.max, vendor.min);
     
   return (
     <Marker 
@@ -91,7 +107,7 @@ const VendorMarker = memo(({ vendor, icon }: { vendor: Vendor; icon: L.Icon }) =
               <button className="action-button directions-btn" onClick={showNotification}>
                 <i className="fa fa-directions"></i>
               </button>
-              <h3>بدون حداقل و حداکثر </h3>
+              <h3>{offerInfo}</h3>
               <button className="action-button share-btn" onClick={showNotification}>
                 <i className="fa fa-share-alt"></i>
               </button>
