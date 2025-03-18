@@ -5,41 +5,29 @@ class VendorScraper:
     def __init__(self, jwt_token):
         self.jwt_token = jwt_token
         self.vendors_collection = vendors_collection
-
-    def fetch_page(self, page_number, page_size):
-        cookies = {
-            'rl_page_init_referrer': 'RudderEncrypt%3AU2FsdGVkX1%2BQlt9CWMRJvpFowIHu7xhMG8Qbw4SG0ZoE64z7%2FCGyG%2BNTakf2IWqo',
-            'rl_page_init_referring_domain': 'RudderEncrypt%3AU2FsdGVkX19Sx%2B2sOgJhEgH%2FVioG6QSeD8tkMw3Ntmabasovl2W3teH62a%2Bf9dIo',
-            '_gcl_au': '1.1.1894155152.1733580242',
-            '_ym_d': '1736849037',
-            '_clck': '11a05ld%7C2%7Cfsq%7C0%7C1840',
-            '_ga_5RS662533M': 'GS1.2.1737391261.2.1.1737391487.0.0.0',
-            '_ga_EH0ZS5CKXJ': 'GS1.2.1737391261.3.1.1737392407.60.0.0',
-            '_ga_DLKJDL41ZH': 'GS1.1.1737453636.5.0.1737453636.60.0.0',
-            '_ga_G5J9VQQMGL': 'GS1.1.1737453636.5.0.1737453636.60.0.0',
-            'rl_group_id': 'RudderEncrypt%3AU2FsdGVkX19nVKDbaIYxJxIs74IME237Amoh%2Fzfv8%2BA%3D',
-            'rl_group_trait': 'RudderEncrypt%3AU2FsdGVkX181r6FgOr%2BWa6Ah0sl%2FSQDAjyW3hXhjNz0%3D',
-            'rl_anonymous_id': 'RudderEncrypt%3AU2FsdGVkX185z4yzsoYvUSgYaHx8ehgtwNbMri7SyTkiI%2F0cgW4WRZGrQQni50CSJ0GNS44X7O4SCtJYmExIwQ%3D%3D',
-            'rl_user_id': 'RudderEncrypt%3AU2FsdGVkX1%2BUBFqVyQNwKTPzwYryPb%2FduR0Q8LLruVI%3D',
-            'rl_trait': 'RudderEncrypt%3AU2FsdGVkX1%2FMjE1nQcuthj%2BSdGLUTk%2BttHA991LCQ0wKZwlmL0GutWlRTC9uETOJHclJQBma9njGg2KLsZAPD8OhlT0zPxKbaLJQIbqMwYobI%2F21MwqqVViJ6DJM7aKPOeD2X94%2Brnaohbr0sRAyi5YrFqYsMHXeVtHJmW94z8zukK39PSk0UXjVB0mnEdlH',
-            'rl_session': 'RudderEncrypt%3AU2FsdGVkX1%2Boaj%2BTMmdFwJJsCkSgOAw7ULGI%2BhgBDPJuNKnUiQs%2FlPyog7Q6Nrg14rAB%2Fw%2BPhR7q7nE9mRiBS2nSKLZnJZOk6edzVC3JoSxj2V%2BhqH7WOKVcs1bWqRctmFj%2BPn148iiZ5Qpgah50eA%3D%3D',
+    
+    def fetch_vendor_details(self, vendor_id):
+        headers = {
+            'accept': 'application/json',
+            'authorization': f'jwt {self.jwt_token}',
+            'origin': 'https://foodro.snappfood.ir',
+            'referer': 'https://foodro.snappfood.ir/',
+            'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
         }
 
+        response = requests.get(
+            f'https://foodro-api.snappfood.ir/CustomerVendor/GetVendorDetail?vendorID={vendor_id}',
+            headers=headers,
+        )
+
+        return response.json()
+
+    def fetch_page(self, page_number, page_size):
         headers = {
-            'accept': 'application/json, text/plain, */*',
-            'accept-language': 'en-US,en;q=0.9',
-            'access-control-allow-credentials': 'true',
-            'access-control-allow-headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-            'access-control-allow-methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-            'access-control-allow-origin': '*',
+            'accept': 'application/json',
             'authorization': f'jwt {self.jwt_token}',
-            'dnt': '1',
             'origin': 'https://foodro.snappfood.ir',
-            'priority': 'u=1, i',
             'referer': 'https://foodro.snappfood.ir/',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-site',
             'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
         }
 
@@ -51,7 +39,6 @@ class VendorScraper:
         response = requests.get(
             'https://foodro-api.snappfood.ir/CustomerVendor/GetHomePageList',
             params=params,
-            cookies=cookies,
             headers=headers,
         )
 
@@ -74,6 +61,13 @@ class VendorScraper:
                     upsert=True
                 )
             print(f"Successfully processed {len(vendors)} vendors in MongoDB")
+    
+    def store_vendor_details(self, vendor_id, vendor_details):
+        self.vendors_collection.update_one(
+            {'id': vendor_id},
+            {'$set': {'details': vendor_details}},
+            upsert=True
+        )
 
     def scrape_all_pages(self, start_page=1, page_size=20):
         page_number = start_page
@@ -84,6 +78,8 @@ class VendorScraper:
                 self.store_vendors(vendors)
                 print(f"Successfully processed page {page_number}")
                 page_number += 1
+                if len(vendors) == 0:
+                    break
             except Exception as e:
                 print(f"Error scraping page {page_number}: {e}")
                 break
