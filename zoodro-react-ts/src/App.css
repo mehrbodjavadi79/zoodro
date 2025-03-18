@@ -797,6 +797,11 @@ body, html {
 /* Custom font for map elements */
 .leaflet-container {
   font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif !important;
+  outline: 0;
+  touch-action: none;
+  transform: translateZ(0);
+  perspective: 1000;
+  backface-visibility: hidden;
 }
 
 /* Override Leaflet's default font settings */
@@ -819,4 +824,35 @@ body, html {
   background-color: rgba(255, 255, 255, 0.8) !important;
   padding: 2px 5px !important;
   border-radius: 3px !important;
+}
+
+/* Add these styles to prevent white flash during map interactions */
+.leaflet-tile {
+  filter: brightness(1.03);
+  transition: filter 0.1s ease-in-out;
+}
+
+.no-flash-tile-layer {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Improve performance during interaction */
+.leaflet-zoom-anim .leaflet-zoom-animated {
+  will-change: transform;
+}
+
+.leaflet-marker-icon {
+  will-change: transform;
+}
+
+/* Add smooth transitions for better pinch-to-zoom feel */
+.leaflet-zoom-animated {
+  transition: transform 0.10s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Improve panning feel */
+.leaflet-drag-target {
+  will-change: transform;
 }

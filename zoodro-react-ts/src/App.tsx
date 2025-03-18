@@ -14,7 +14,7 @@ import { fetchVendorsNearLocation } from './api/vendorService';
 const DEFAULT_CENTER: [number, number] = [35.6892, 51.3890];
 
 // Zoom level limits
-const MIN_ZOOM_LEVEL = 14;
+const MIN_ZOOM_LEVEL = 4;
 const MAX_ZOOM_LEVEL = 18;
 const USER_LOCATION_ZOOM_LEVEL = 16;
 
@@ -170,40 +170,64 @@ const App: React.FC = () => {
   // Map event handlers component
   const MapEvents = () => {
     const map = useMap();
+    const updateTimeoutRef = useRef<number | null>(null);
     
+    // Initial setup
     useEffect(() => {
-      map.setView(mapCenter, zoom);
-      // Set min and max zoom constraints
+      // Set zoom constraints
       map.setMinZoom(MIN_ZOOM_LEVEL);
       map.setMaxZoom(MAX_ZOOM_LEVEL);
-    }, [map, mapCenter, zoom]);
-    
-    useEffect(() => {
-      const onMoveEnd = () => {
-        const center = map.getCenter();
-        debouncedSetMapCenter([center.lat, center.lng]);
-      };
       
-      const onZoomEnd = () => {
-        const currentZoom = map.getZoom();
-        // Ensure zoom is within limits
-        if (currentZoom < MIN_ZOOM_LEVEL) {
-          map.setZoom(MIN_ZOOM_LEVEL);
-        } else if (currentZoom > MAX_ZOOM_LEVEL) {
-          map.setZoom(MAX_ZOOM_LEVEL);
-        } else {
-          setZoom(currentZoom);
-        }
-      };
-      
-      map.on('moveend', onMoveEnd);
-      map.on('zoomend', onZoomEnd);
+      // Set initial view
+      map.setView(mapCenter, zoom, { animate: false });
       
       return () => {
-        map.off('moveend', onMoveEnd);
-        map.off('zoomend', onZoomEnd);
+        // Clear any pending updates
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
       };
-    }, [map]);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    // Handle external updates to center/zoom
+    useEffect(() => {
+      map.setView(mapCenter, zoom, { animate: false });
+    }, [map, mapCenter, zoom]);
+    
+    // Handle map interactions
+    useEffect(() => {
+      const updateStateFromMap = () => {
+        // Ensure we're not scheduling multiple updates
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
+        
+        // Use a short delay to batch updates
+        updateTimeoutRef.current = window.setTimeout(() => {
+          const center = map.getCenter();
+          const newZoom = map.getZoom();
+          
+          setMapCenter([center.lat, center.lng]);
+          if (newZoom !== zoom) {
+            setZoom(newZoom);
+          }
+          
+          updateTimeoutRef.current = null;
+        }, 100);
+      };
+      
+      map.on('moveend', updateStateFromMap);
+      map.on('zoomend', updateStateFromMap);
+      
+      return () => {
+        map.off('moveend', updateStateFromMap);
+        map.off('zoomend', updateStateFromMap);
+        
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current);
+        }
+      };
+    }, [map, zoom]);
     
     return null;
   };
@@ -217,10 +241,24 @@ const App: React.FC = () => {
         zoom={zoom}
         style={{ height: '100vh', width: '100%' }}
         zoomControl={false}
+        fadeAnimation={false}
+        zoomAnimation={false}
+        markerZoomAnimation={false}
+        preferCanvas={true}
+        zoomSnap={0.0}
+        zoomDelta={0.25}
+        wheelPxPerZoomLevel={120}
+        touchZoom={true}
+        doubleClickZoom={false}
+        bounceAtZoomLimits={false}
       >
         <TileLayer
           attribution={MAP_LAYERS[currentMapLayer as keyof typeof MAP_LAYERS].attribution}
           url={MAP_LAYERS[currentMapLayer as keyof typeof MAP_LAYERS].url}
+          className="no-flash-tile-layer"
+          keepBuffer={8} 
+          updateWhenZooming={false}
+          updateWhenIdle={true}
         />
         
         <MarkerManager 
