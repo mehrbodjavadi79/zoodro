@@ -34,28 +34,32 @@ def vendors():
     except:
         return jsonify({"error": "Invalid request parameters"}), 400
     
-    vendors = vendors_collection.find({}, {
+    vendors = vendors_collection.find({
+        "longitude": {"$gte": req.top_left_lng},
+        "longitude": {"$lte": req.bottom_right_lng},
+        "latitude": {"$lte": req.top_left_lat},
+        "latitude": {"$gte": req.bottom_right_lat},
+    }, {
         "latitude": 1,
         "longitude": 1,
         "title": 1,
         "maxOfferPercent": 1,
         "details.offer.upperLimit": 1,
         "details.offer.lowerLimit": 1,
-        })
+    }).sort("maxOfferPercent", -1)
     vendors_dto = []
     for vendor in vendors:
-        if vendor["latitude"] < req.top_left_lat \
-            and vendor["latitude"] > req.bottom_right_lat \
-            and vendor["longitude"] > req.top_left_lng \
-            and vendor["longitude"] < req.bottom_right_lng:
-            vendors_dto.append({
-                "lat": vendor["latitude"],
-                "lng": vendor["longitude"],
-                "name": vendor["title"],
-                "off": int(vendor['maxOfferPercent']),
-                "max": getOfferMax(vendor.get('details', {}).get('offer')),
-                "min": getOfferMin(vendor.get('details', {}).get('offer')),
-            })
+        if int(vendor['maxOfferPercent']) == 0:
+            continue
+
+        vendors_dto.append({
+            "lat": vendor["latitude"],
+            "lng": vendor["longitude"],
+            "name": vendor["title"],
+            "off": int(vendor['maxOfferPercent']),
+            "max": getOfferMax(vendor.get('details', {}).get('offer')),
+            "min": getOfferMin(vendor.get('details', {}).get('offer')),
+        })
 
     return jsonify({"vendors": [v for v in vendors_dto]})
 
