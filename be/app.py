@@ -35,10 +35,12 @@ def vendors():
         return jsonify({"error": "Invalid request parameters"}), 400
     
     vendors = vendors_collection.find({
-        "longitude": {"$gte": req.top_left_lng},
-        "longitude": {"$lte": req.bottom_right_lng},
-        "latitude": {"$lte": req.top_left_lat},
-        "latitude": {"$gte": req.bottom_right_lat},
+        "$and": [
+            {"longitude": {"$gte": req.top_left_lng}},
+            {"longitude": {"$lte": req.bottom_right_lng}},
+            {"latitude": {"$lte": req.top_left_lat}},
+            {"latitude": {"$gte": req.bottom_right_lat}}
+        ]
     }, {
         "latitude": 1,
         "longitude": 1,

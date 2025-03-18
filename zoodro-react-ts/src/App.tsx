@@ -14,7 +14,7 @@ import { fetchVendorsNearLocation } from './api/vendorService';
 const DEFAULT_CENTER: [number, number] = [35.6892, 51.3890];
 
 // Zoom level limits
-const MIN_ZOOM_LEVEL = 4;
+const MIN_ZOOM_LEVEL = 14;
 const MAX_ZOOM_LEVEL = 18;
 const USER_LOCATION_ZOOM_LEVEL = 16;
 
