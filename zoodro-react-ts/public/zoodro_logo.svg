@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#3f88f2" />
+  
+  <!-- Inner gradient circle -->
+  <circle cx="256" cy="256" r="220" fill="url(#gradient)" />
+  
+  <!-- Map pin shape -->
+  <path d="M256 120c-66.2 0-120 53.8-120 120 0 45 70 150 100 200 10 16.7 30 16.7 40 0 30-50 100-155 100-200 0-66.2-53.8-120-120-120zm0 180c-33.1 0-60-26.9-60-60s26.9-60 60-60 60 26.9 60 60-26.9 60-60 60z" 
+        fill="white" />
+        
+  <!-- Z letter -->
+  <path d="M222 220h76c5.5 0 10 4.5 10 10s-4.5 10-10 10h-76l76 60c4.4 3.5 5.1 9.8 1.6 14.2-3.5 4.4-9.8 5.1-14.2 1.6l-96-76c-3.4-2.7-4.9-7.1-3.9-11.3 1-4.2 4.7-7.2 9-7.5l86-8-86-43c-5-2.5-7-8.6-4.5-13.6s8.6-7 13.6-4.5l96 48c3.8 1.9 6.2 5.7 6.2 9.9s-2.5 8-6.2 9.9L222 220z" 
+        fill="#00c853" />
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#64b5f6" />
+      <stop offset="100%" stop-color="#2962ff" />
+    </linearGradient>
+  </defs>
+</svg> 
