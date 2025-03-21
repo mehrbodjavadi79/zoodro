@@ -297,6 +297,23 @@ const App: React.FC = () => {
           با زودرو، دیگر نیازی به جستجوی طولانی برای یافتن تخفیف ندارید. تمام تخفیف‌های فودرو روی نقشه به شما نمایش داده می‌شوند.
           foodro map را امتحان کنید و از مزایای تخفیف فودرو بهره‌مند شوید.
         </p>
+        <h2>اپلیکیشن تخفیف غذا | نقشه رستوران های اطراف من</h2>
+        <p>
+          زودرو یا فودمپ بهترین نقشه تخفیف برای پیدا کردن رستوران های اطراف من با تخفیف است.
+          تخفیف کافه، تخفیف فست فود و تخفیف رستوران همه در یک نقشه جمع شده‌اند.
+          کوپن تخفیف رستوران‌ها را روی نقشه پیدا کنید و از غذای ارزان لذت ببرید.
+        </p>
+        <h3>Food Discount Map | Restaurant Deals Near Me</h3>
+        <p>
+          Zoodro is the best food discount map application for finding restaurant deals and cafe offers near you.
+          Discover the closest food discounts on the map with our discount locator service.
+          Find pizza discounts, fast food offers, and affordable food options all in one place.
+        </p>
+        <h3>نزدیکترین تخفیف غذا | Best Food Discounts</h3>
+        <p>
+          با استفاده از نقشه زودرو، نزدیکترین تخفیف‌های غذا را پیدا کنید. این سرویس تخفیف سفارش غذا 
+          به شما کمک می‌کند در هزینه‌های روزانه صرفه‌جویی کنید. بهترین پیشنهادات غذایی تهران همه در زودرو.
+        </p>
       </div>
     </div>
   );
