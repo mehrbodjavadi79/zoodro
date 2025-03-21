@@ -151,6 +151,20 @@ body, html {
   font-family: 'Vazirmatn', sans-serif;
 }
 
+/* Bounce animation for high discounts */
+.bounce-marker .offer-marker-container {
+  animation: bounce 1.2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* Popup Styles */
 .custom-popup .leaflet-popup-content-wrapper {
   border-radius: 16px;

@@ -24,20 +24,28 @@ interface MarkerManagerProps {
 }
 
 // Create a custom offer icon with the discount text
-const createCustomOfferIcon = (discount: number): L.DivIcon => {
+const createCustomOfferIcon = (discount: number, bounce: boolean): L.DivIcon => {
   const normalizedDiscount = discount / 100;  
-  const hue = 120; // Green
-  const saturation = 60 + (normalizedDiscount * 40); // 60-100%
-  const lightness = 60 - (normalizedDiscount * 35); // 60-25%
+  
+  // Use a gradient from red-yellow to green based on discount value
+  const hue = normalizedDiscount < 0.3 ? 40 - (normalizedDiscount * 100) : 120 - (normalizedDiscount * 10);
+  const saturation = 70 + (normalizedDiscount * 30);
+  const lightness = normalizedDiscount < 0.3 ? 55 : 50 - (normalizedDiscount * 30);
   
   const backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  const textColor = '#ffffff';
+  const borderColor = `hsla(${hue}, ${saturation}%, ${lightness - 20}%, 0.8)`;
+  
+  const bounceClass = bounce ? 'bounce-marker' : '';
+
+  const persianDiscount = discount.toLocaleString('fa-IR');
   
   return L.divIcon({
-    className: 'offer-marker',
+    className: `offer-marker ${bounceClass}`,
     html: `
       <div class="offer-marker-container">
-        <div class="offer-marker-icon" style="background-color:${backgroundColor};">
-          <span class="offer-marker-text" style="font-family: 'Vazirmatn', 'Tahoma', sans-serif;">٪${discount}</span>
+        <div class="offer-marker-icon" style="background-color:${backgroundColor}; border: 1.5px solid ${borderColor}; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+          <span class="offer-marker-text" style="font-family: 'Vazirmatn', 'Tahoma', sans-serif; color: ${textColor};">٪${persianDiscount}</span>
         </div>
       </div>
     `,
@@ -47,14 +55,15 @@ const createCustomOfferIcon = (discount: number): L.DivIcon => {
   });
 };
 
-
 const formatOfferInfo = (max: number | null, min: number | null): string => {
+  const persianMax = max ? (max/10).toLocaleString('fa-IR') : null;
+  const persianMin = min ? (min/10).toLocaleString('fa-IR') : null;
   if (max && min) {
-    return `حداقل خرید ${min/10} ت - حداکثر ${max/10} ت`;
+    return `حداقل خرید ${persianMin} ت - حداکثر ${persianMax} ت`;
   } else if (max) {
-    return `حداکثر ${max/10} ت`;
+    return `حداکثر ${persianMax} ت`;
   } else if (min) {
-    return `حداقل خرید ${min/10} ت`;
+    return `حداقل خرید ${persianMin} ت`;
   }
   return "نامحدود";
 };
@@ -63,7 +72,7 @@ const formatOfferInfo = (max: number | null, min: number | null): string => {
 const VendorMarker = memo(({ vendor, icon }: { vendor: Vendor; icon: L.Icon }) => {
   // Create a custom offer icon if there's a discount
   const markerIcon = vendor.off !== null && vendor.off !== undefined
-    ? createCustomOfferIcon(vendor.off)
+    ? createCustomOfferIcon(vendor.off, vendor.max === null && vendor.min === null && vendor.off >= 30)
     : icon;
     
   const showNotification = (e: React.MouseEvent) => {
