@@ -233,7 +233,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="App">
       {/* <SearchBar onSearch={handleSearch} hasUserLocation={!!userLocation} /> */}
       
       <MapContainer
@@ -283,6 +283,21 @@ const App: React.FC = () => {
         hasUserLocation={!!userLocation}
         isLocating={isLocating}
       />
+
+      {/* SEO Content - Hidden but readable by search engines */}
+      <div className="seo-content" style={{ display: 'none' }}>
+        <h1>زودرو - نقشه تخفیف‌های فودرو (foodro map)</h1>
+        <p>
+          نقشه فودرو یا زودرو مکان‌یابی برای پیدا کردن بهترین تخفیف‌های رستوران، کافه و فست‌فود در اطراف شما است.
+          با استفاده از سرویس foodro map (نقشه فودرو) می‌توانید به راحتی تخفیف‌های نزدیک خود را پیدا کنید.
+          سایت zooodro.ir به شما کمک می‌کند بهترین تخفیف فودرو را بیابید.
+        </p>
+        <h2>تخفیف فودرو - بهترین پیشنهادات نزدیک شما</h2>
+        <p>
+          با زودرو، دیگر نیازی به جستجوی طولانی برای یافتن تخفیف ندارید. تمام تخفیف‌های فودرو روی نقشه به شما نمایش داده می‌شوند.
+          foodro map را امتحان کنید و از مزایای تخفیف فودرو بهره‌مند شوید.
+        </p>
+      </div>
     </div>
   );
 };
