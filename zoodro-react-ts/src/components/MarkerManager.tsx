@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, memo } from 'react';
+import React, { useEffect, useMemo, memo, useState } from 'react';
 import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { createCustomIcon, createUserLocationIcon } from '../utils/mapUtils';
+import DirectionsModal from './DirectionsModal';
 
 // Fix Leaflet icon issue in React
 import 'leaflet/dist/leaflet.css';
@@ -69,7 +70,9 @@ const formatOfferInfo = (max: number | null, min: number | null): string => {
 };
 
 // Memoized individual vendor marker component
-const VendorMarker = memo(({ vendor, icon }: { vendor: Vendor; icon: L.Icon }) => {
+const VendorMarker = memo(({ vendor, icon, userLocation }: { vendor: Vendor; icon: L.Icon; userLocation: [number, number] | null }) => {
+  const [showDirectionsModal, setShowDirectionsModal] = useState(false);
+  
   // Create a custom offer icon if there's a discount
   const markerIcon = vendor.off !== null && vendor.off !== undefined
     ? createCustomOfferIcon(vendor.off, vendor.max === null && vendor.min === null && vendor.off >= 30)
@@ -100,31 +103,46 @@ const VendorMarker = memo(({ vendor, icon }: { vendor: Vendor; icon: L.Icon }) =
   };
 
   const offerInfo = formatOfferInfo(vendor.max, vendor.min);
+  
+  const openDirectionsModal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowDirectionsModal(true);
+  };
     
   return (
-    <Marker 
-      position={[vendor.lat, vendor.lng]}
-      icon={markerIcon}
-    >
-      <Popup className="custom-popup" closeButton={false}>
-        <div className="marker-info" dir="rtl" style={{ width: '100%' }}>
-          <div className="marker-header" style={{ padding: '5px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <h2 style={{ margin: '5px 0', fontSize: '16px' }}>{vendor.name}</h2>
-          </div>
-          <div className="marker-content">
-            <div className="marker-actions">
-              <button className="action-button directions-btn" onClick={showNotification}>
-                <i className="fa fa-directions"></i>
-              </button>
-              <h3>{offerInfo}</h3>
-              <button className="action-button share-btn" onClick={showNotification}>
-                <i className="fa fa-share-alt"></i>
-              </button>
+    <>
+      <Marker 
+        position={[vendor.lat, vendor.lng]}
+        icon={markerIcon}
+      >
+        <Popup className="custom-popup" closeButton={false}>
+          <div className="marker-info" dir="rtl" style={{ width: '100%' }}>
+            <div className="marker-header" style={{ padding: '5px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <h2 style={{ margin: '5px 0', fontSize: '16px' }}>{vendor.name} - {vendor.off.toLocaleString('fa-IR')}%</h2>
+            </div>
+            <div className="marker-content">
+              <div className="marker-actions">
+                <button className="action-button directions-btn" onClick={openDirectionsModal}>
+                  <i className="fa fa-directions"></i>
+                </button>
+                <h3>{offerInfo}</h3>
+                <button className="action-button share-btn" onClick={showNotification}>
+                  <i className="fa fa-share-alt"></i>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </Popup>
-    </Marker>
+        </Popup>
+      </Marker>
+      
+      {showDirectionsModal && (
+        <DirectionsModal
+          onClose={() => setShowDirectionsModal(false)}
+          vendorLocation={{ lat: vendor.lat, lng: vendor.lng }}
+          userLocation={userLocation}
+        />
+      )}
+    </>
   );
 });
 
@@ -178,6 +196,7 @@ const MarkerManager: React.FC<MarkerManagerProps> = ({ vendors = [], userLocatio
           key={`vendor-${index}-${vendor.lat}-${vendor.lng}`}
           vendor={vendor}
           icon={customIcon}
+          userLocation={userLocation}
         />
       ))}
       
