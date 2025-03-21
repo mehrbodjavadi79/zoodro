@@ -303,6 +303,11 @@ const App: React.FC = () => {
           تخفیف کافه، تخفیف فست فود و تخفیف رستوران همه در یک نقشه جمع شده‌اند.
           کوپن تخفیف رستوران‌ها را روی نقشه پیدا کنید و از غذای ارزان لذت ببرید.
         </p>
+        <h3>رستوران های فودرو و کافه های فودرو | Zoodro, Zooodro, Zoooodro</h3>
+        <p>
+          نزدیک ترین رستوران های فودرو و نزدیک ترین کافه های فودرو را در زوودرو، زودرو یا زووودرو (Zoodro, Zooodro, Zoooodro) پیدا کنید.
+          کافه تخفیف دار و رستوران های تخفیف دار را روی نقشه مشاهده کنید و به راحتی مکان‌های دارای تخفیف را بیابید.
+        </p>
         <h3>Food Discount Map | Restaurant Deals Near Me</h3>
         <p>
           Zoodro is the best food discount map application for finding restaurant deals and cafe offers near you.
