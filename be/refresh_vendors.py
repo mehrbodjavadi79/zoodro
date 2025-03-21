@@ -28,10 +28,10 @@ def refresh_vendors():
                 break
 
         chunk_size = 200
-        total_count = temp_vendors_collection.count_documents({"details": {"$exists": False}})
+        total_count = temp_vendors_collection.count_documents({"details": {"$exists": True}})
         processed = 0
         
-        vendor_ids = [doc["id"] for doc in temp_vendors_collection.find({"details": {"$exists": False}}, {"id": 1})]
+        vendor_ids = [doc["id"] for doc in temp_vendors_collection.find({"details": {"$exists": True}}, {"id": 1})]
         
         print(f"Total vendors to process: {total_count}")
         
