@@ -8,4 +8,5 @@ MONGO_DB_URL = os.getenv("MONGO_DB_URL")
 client = MongoClient(MONGO_DB_URL)
 db = client['zoodro']
 vendors_collection = db['vendors']
+temp_vendors_collection = db['temp_vendors']
 

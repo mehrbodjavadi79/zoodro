@@ -1,0 +1,5 @@
+{
+    "cron": [
+      "0 8,12,16,22 * * * cd $ROOT && python3 refresh_vendors.py"
+    ]
+  }

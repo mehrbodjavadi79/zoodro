@@ -1,8 +1,10 @@
 import requests
-from mongo import vendors_collection
+from time import sleep
+import concurrent.futures
+
 
 class VendorScraper:
-    def __init__(self, jwt_token):
+    def __init__(self, jwt_token, vendors_collection):
         self.jwt_token = jwt_token
         self.vendors_collection = vendors_collection
     
@@ -19,6 +21,9 @@ class VendorScraper:
             f'https://foodro-api.snappfood.ir/CustomerVendor/GetVendorDetail?vendorID={vendor_id}',
             headers=headers,
         )
+
+        if response.status_code != 200:
+            print("error in fetching vendor details", response.status_code, response.json())
 
         return response.json()
 
@@ -83,3 +88,42 @@ class VendorScraper:
             except Exception as e:
                 print(f"Error scraping page {page_number}: {e}")
                 break
+    
+    def scrape_all_vendors(self):
+        print("fetching all vendors...")
+        self.scrape_all_pages(start_page=1)
+        print("fetching all vendors: done")
+
+
+    def fetch_vendors_details(self):
+        print("fetching vendor details...")
+
+        vendors = self.vendors_collection.find({"details": {"$exists": False}}, {"id": 1})
+        vendors_list = list(vendors)
+
+        print(f"Total vendors to process: {len(vendors_list)}")
+
+        def process_vendor(vendor):
+            print("fetching vendor details for", vendor["id"])
+            try:
+                result = self.fetch_vendor_details(vendor["id"])
+                self.store_vendor_details(vendor["id"], result)
+                return vendor["id"]
+            except Exception as e:
+                print(f"Error fetching vendor details for {vendor['id']}: {e}")
+                return None
+
+        batch_size = 50
+        for i in range(0, len(vendors_list), batch_size):
+            batch = vendors_list[i:i+batch_size]
+            
+            with concurrent.futures.ThreadPoolExecutor(max_workers=batch_size) as executor:
+                futures = [executor.submit(process_vendor, vendor) for vendor in batch]
+                for future in concurrent.futures.as_completed(futures):
+                    vendor_id = future.result()
+                    print(f"Completed vendor {vendor_id}")
+            
+            sleep(0.1)
+
+        print("fetching vendor details: done")
+
