@@ -27,6 +27,9 @@ def refresh_vendors():
             if temp_vendors_collection.count_documents({"details": {"$exists": False}}) == 0:
                 break
 
+        # Mark all existing vendors as outdated
+        vendors_collection.update_many({}, {"$set": {"outdated": True}})
+        
         chunk_size = 200
         total_count = temp_vendors_collection.count_documents({"details": {"$exists": True}})
         processed = 0
@@ -43,6 +46,8 @@ def refresh_vendors():
                 if '_id' in doc:
                     doc.pop('_id')
                 
+                # Add the document and remove the outdated flag
+                doc["outdated"] = False
                 vendors_collection.update_one(
                     {"id": doc["id"]},
                     {"$set": doc},
@@ -51,6 +56,10 @@ def refresh_vendors():
             
             processed += len(chunk_docs)
             print(f"Processed {processed}/{total_count} vendors")
+        
+        # Remove all vendors that still have the outdated flag
+        result = vendors_collection.delete_many({"outdated": True})
+        print(f"Removed {result.deleted_count} outdated vendors")
 
     except Exception as e:
         print(f"Error refreshing vendors: {e}")
