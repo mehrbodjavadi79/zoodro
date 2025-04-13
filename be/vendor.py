@@ -104,7 +104,6 @@ class VendorScraper:
         print(f"Total vendors to process: {len(vendors_list)}")
 
         def process_vendor(vendor):
-            print("fetching vendor details for", vendor["id"])
             try:
                 result = self.fetch_vendor_details(vendor["id"])
                 self.store_vendor_details(vendor["id"], result)
@@ -113,16 +112,19 @@ class VendorScraper:
                 print(f"Error fetching vendor details for {vendor['id']}: {e}")
                 return None
 
-        batch_size = 50
+        batch_size = 30
         for i in range(0, len(vendors_list), batch_size):
             batch = vendors_list[i:i+batch_size]
+            completed_vendors = []
             
             with concurrent.futures.ThreadPoolExecutor(max_workers=batch_size) as executor:
                 futures = [executor.submit(process_vendor, vendor) for vendor in batch]
                 for future in concurrent.futures.as_completed(futures):
                     vendor_id = future.result()
-                    print(f"Completed vendor {vendor_id}")
+                    if vendor_id:
+                        completed_vendors.append(vendor_id)
             
+            print(f"Completed {len(completed_vendors)} vendors in batch: {i//batch_size + 1}")
             sleep(0.1)
 
         print("fetching vendor details: done")
