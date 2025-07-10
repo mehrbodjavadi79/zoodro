@@ -1,0 +1,5 @@
+{
+  "app":"zooodro-be-go",
+  "port": 3030,
+  "procfile" : "main.go"
+}
