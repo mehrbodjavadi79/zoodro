@@ -2,7 +2,7 @@
  * Service for fetching vendor data from the API
  */
 
-const API_BASE_URL = 'https://zooodro-be.liara.run';
+const API_BASE_URL = 'https://zooodro-be-go.liara.run';
 
 interface VendorResponse {
   vendors: {
