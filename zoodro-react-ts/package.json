@@ -29,7 +29,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "liara deploy -a zooodro"
+    "deploy-dev": "vercel deploy",
+    "deploy": "vercel deploy --prod"
   },
   "eslintConfig": {
     "extends": [
